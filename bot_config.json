@@ -1,0 +1,21 @@
+
+{
+  "tier_channel_id": null,
+  "auction_forum_channel_id": null,
+  "premium_auction_forum_channel_id": null,
+  "item_auction_forum_channel_id": null,
+  "levelup_channel_id": null,
+  "suggestions_channel_id": null,
+  "reports_channel_id": null,
+  "staff_roles": [],
+  "currency_symbol": "💰",
+  "default_embed_color": 5814783,
+  "tier_colors": {
+    "S": 16711680,
+    "A": 16753920,
+    "B": 65280,
+    "C": 255,
+    "D": 8421504
+  },
+  "item_auction_forum_channel_id": null
+}

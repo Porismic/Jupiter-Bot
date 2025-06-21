@@ -1,0 +1,18 @@
+
+{
+  "regular": {
+    "template": "# {title}{server_text} <:cutesy_star:1364222257349525506>\nᯓ★ {rarity_type_line}\n<:neonstars:1364582630363758685> ── .✦ Seller: {seller}\n\n      ✶⋆.˚ Payment Methods:\n                 {payment_methods}\n\n╰┈➤ Starting: ${starting_bid}\n╰┈➤ Increase: {increase}\n╰┈➤ IA: {instant_accept}\n\n{extra_info_section}{holds_section}     Ends: {end_timestamp}\n\n{role_mentions}",
+    "last_updated": 1640995200,
+    "updated_by": "system"
+  },
+  "premium": {
+    "template": "# {title}{server_text} ⭐ <:cutesy_star:1364222257349525506>\nᯓ★ {rarity_type_line}\n<:neonstars:1364582630363758685> ── .✦ Seller: {seller}\n\n      ✶⋆.˚ Payment Methods:\n                 {payment_methods}\n\n╰┈➤ Starting: ${starting_bid}\n╰┈➤ Increase: {increase}\n╰┈➤ IA: {instant_accept}\n\n{extra_info_section}{holds_section}     Ends: {end_timestamp}\n\n{role_mentions}",
+    "last_updated": 1640995200,
+    "updated_by": "system"
+  },
+  "item_trade": {
+    "template": "# {title}{server_text} <:cutesy_star:1364222257349525506>\nᯓ★ {rarity_type_line}\n<:neonstars:1364582630363758685> ── .✦ Seller: {seller}\n\n{looking_for_section}{preferred_colors_section}╰┈➤ IA: {instant_accept}\n\n{extra_info_section}{holds_section}{end_timestamp_section}{role_mentions}",
+    "last_updated": 1640995200,
+    "updated_by": "system"
+  }
+  }
