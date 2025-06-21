@@ -5069,7 +5069,7 @@ async def handle_member_join_invite_tracking(member: discord.Member):
 
             # Keep only last 10 recent invites
             if len(invite_data["members"][inviter_id]["recent_invites"]) > 10:
-            invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
+                invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
 
             # Record who invited this member
             member_id = str(member.id)
