@@ -1,5 +1,5 @@
+from discord.ext import tasks, commands
 import discord
-from discord.ext import commands, tasks
 from discord import app_commands
 import json
 import os
@@ -5680,6 +5680,7 @@ class AuctionFormatEditorView(discord.ui.View):
 <:neonstars:1364582630363758685> ── .✦ Seller: {seller}
 
 {looking_for_section}{preferred_colors_section}╰┈➤ IA: {instant_accept}
+"""
 
 @tree.command(name="embed", description="Comprehensive embed creation and management", guild=discord.Object(id=GUILD_ID))
 @guild_only()
@@ -6274,7 +6275,6 @@ async def on_reaction_remove(reaction, user):
                 pass
 
 # --------- Start the bot -----------
-
 @bot.event
 async def on_error(event, *args, **kwargs):
     """Global error handler"""
@@ -6299,10 +6299,18 @@ if __name__ == "__main__":
         logger.error(f"Failed to start bot: {e}")
         print(f"Bot failed to start: {e}")
 
+# --------- The following code should be moved back to the appropriate class -----------
+# This code appears to be from a class method and should be placed in the correct class:
 
-{extra_info_section}{holds_section}{end_timestamp_section}{role_mentions}"""
+# Example of where this code should go (in the appropriate class):
+"""
+class YourClassName:
+    # ... other methods ...
+    
+    def get_default_template(self):
+        # ... existing code ...
         return "Default format not available"
-
+    
     def generate_preview(self, template):
         # Sample data for preview
         sample_data = {
@@ -6327,10 +6335,10 @@ if __name__ == "__main__":
             return template.format(**sample_data)
         except KeyError as e:
             return f"Error in template: Missing variable {e}"
-
+    
     def get_available_variables(self):
         if self.category in ["regular", "premium"]:
-            return """**Basic Variables:**
+            return '''**Basic Variables:**
 `{title}` - Item name
 `{server_text}` - Server location (e.g., " (US)")
 `{rarity_type_line}` - Rarity and type (e.g., "S ‧ EXO")
@@ -6340,27 +6348,49 @@ if __name__ == "__main__":
 `{increase}` - Bid increase amount
 `{instant_accept}` - IA amount
 `{end_timestamp}` - End time
-
 **Optional Sections:**
 `{extra_info_section}` - Extra info (if provided)
 `{holds_section}` - Holds info (if provided)
-`{role_mentions}` - @Bidder @Buyer mentions"""
+`{role_mentions}` - @Bidder @Buyer mentions'''
         elif self.category == "item_trade":
-            return """**Basic Variables:**
+            return '''**Basic Variables:**
 `{title}` - Item name
 `{server_text}` - Server location (e.g., " (US)")
 `{rarity_type_line}` - Rarity and type (e.g., "S ‧ EXO")
 `{seller}` - Seller mention
 `{instant_accept}` - IA amount
-
 **Optional Sections:**
 `{looking_for_section}` - Looking for items
 `{preferred_colors_section}` - Preferred colors
 `{extra_info_section}` - Extra info (if provided)
 `{holds_section}` - Holds info (if provided)
 `{end_timestamp_section}` - End time (if provided)
-`{role_mentions}` - @Bidder @Buyer mentions"""
+`{role_mentions}` - @Bidder @Buyer mentions'''
         return "No variables available"
+"""# --------- Start the bot -----------
+@bot.event
+async def on_error(event, *args, **kwargs):
+    """Global error handler"""
+    logger.error(f"Error in event {event}: {args}, {kwargs}")
+
+@tree.error
+async def on_app_command_error(interaction: discord.Interaction, error: app_commands.AppCommandError):
+    """Handle application command errors"""
+    logger.error(f"Application command error: {error}")
+    try:
+        if not interaction.response.is_done():
+            await interaction.response.send_message("An error occurred while processing your command.", ephemeral=True)
+        else:
+            await interaction.followup.send("An error occurred while processing your command.", ephemeral=True)
+    except Exception:
+        pass
+
+if __name__ == "__main__":
+    try:
+        bot.run(TOKEN)
+    except Exception as e:
+        logger.error(f"Failed to start bot: {e}")
+        print(f"Bot failed to start: {e}")
 
 class AuctionFormatEditModal(discord.ui.Modal):
     def __init__(self, category):
