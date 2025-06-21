@@ -4254,8 +4254,6 @@ try:
         color=0xFFA500
     )
 
-    await interaction.response.send_message(embed=embed)
-
     # Schedule unquarantine
     await asyncio.sleep(duration_minutes * 60)
     await unquarantine_user(member, interaction.guild)
