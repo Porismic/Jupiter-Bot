@@ -4638,8 +4638,6 @@ async def inviteleaderboard(interaction: discord.Interaction):
 if self.embed_data["author"]:
     embed.set_author(name=self.embed_data["author"])
 
-return embed
-
 async def update_display(self, interaction: discord.Interaction):
     embed = discord.Embed(
         title="Embed Builder",
