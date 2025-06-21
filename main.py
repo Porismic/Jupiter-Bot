@@ -5895,12 +5895,12 @@ class RoleConfigView(discord.ui.View):
 class GeneralConfigView(discord.ui.View):
     def __init__(self):
         super().__init__(timeout=300)
-
+    
     @discord.ui.button(label="Set Currency Symbol", style=discord.ButtonStyle.secondary)
     async def set_currency_symbol(self, interaction: discord.Interaction, button: discord.ui.Button):
         modal = CurrencySymbolModal()
         await interaction.response.send_modal(modal)
-
+    
     @discord.ui.button(label="← Back to Config", style=discord.ButtonStyle.secondary)
     async def back_to_config(self, interaction: discord.Interaction, button: discord.ui.Button):
         view = ConfigurationView()
@@ -5910,7 +5910,7 @@ class GeneralConfigView(discord.ui.View):
             color=BOT_CONFIG["default_embed_color"]
         )
         await interaction.response.edit_message(embed=embed, view=view)
-
+    
     async def show_general_config(self, interaction):
         embed = discord.Embed(
             title="General Configuration",
@@ -5961,7 +5961,7 @@ async def config_command(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
-# --------- Missing Background Tasks -----------
+# --------- Background Tasks -----------
 @tasks.loop(hours=24)
 async def reset_daily():
     """Reset daily statistics"""
