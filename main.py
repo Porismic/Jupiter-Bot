@@ -9312,25 +9312,49 @@ class EmojiSelectionView(discord.ui.View):
                 emoji_preview += f" ... (+{len(page_emojis) - 10} more)"
             embed.add_field(name="Emojis on this page", value=emoji_preview, inline=False)
         
-        # Show server emoji stats
-        animated_count = len([e for e in guild_emojis if e.animated])
-        static_count = len(guild_emojis) - animated_count
-        embed.add_field(
-            name="Server Emoji Statistics",
-            value=f"Total: {len(guild_emojis)}\nStatic: {static_count}\nAnimated: {animated_count}",
-            inline=True
-        )
-        
-        if hasattr(interaction, 'response') and not interaction.response.is_done():
-            await interaction.response.edit_message(embed=embed, view=self)
-        else:
-            await interaction.edit_original_response(embed=embed, view=self)
+# Show server emoji stats
+animated_count = len([e for e in guild_emojis if e.animated])
+static_count = len(guild_emojis) - animated_count
+embed.add_field(
+    name="Server Emoji Statistics",
+    value=f"Total: {len(guild_emojis)}\nStatic: {static_count}\nAnimated: {animated_count}",
+    inline=True
+)
 
-        elif action.value == "list":
-            embed = discord.Embed(
-                title="Autoresponders",
-                color=BOT_CONFIG["default_embed_color"]
-         )
+if hasattr(interaction, 'response') and not interaction.response.is_done():
+    await interaction.response.edit_message(embed=embed, view=self)
+else:
+    await interaction.edit_original_response(embed=embed, view=self)
+
+# This should be part of a larger if/elif chain
+if action.value == "create":
+    # Your create logic here
+    pass
+elif action.value == "list":
+    embed = discord.Embed(
+        title="Autoresponders",
+        color=BOT_CONFIG["default_embed_color"]
+    )
+    
+    # Check if you have autoresponders stored somewhere
+    # This assumes you have them in a dictionary or list called 'autoresponders'
+    if not autoresponders:  # Replace 'autoresponders' with your actual variable
+        embed.description = "No autoresponders configured."
+    else:
+        # Show list of autoresponders
+        response_list = []
+        for trigger, response in autoresponders.items():  # Adjust based on your data structure
+            # Truncate long responses for display
+            short_response = response[:50] + "..." if len(response) > 50 else response
+            response_list.append(f"**{trigger}** → {short_response}")
+        
+        embed.description = "\n".join(response_list)
+    
+    # Send the embed
+    if hasattr(interaction, 'response') and not interaction.response.is_done():
+        await interaction.response.edit_message(embed=embed, view=self)
+    else:
+        await interaction.edit_original_response(embed=embed, view=self)
         
         if not autoresponders:
             embed.description = "No autoresponders configured."
