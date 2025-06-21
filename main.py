@@ -9299,16 +9299,16 @@ class EmojiSelectionView(discord.ui.View):
                 emoji_preview += f" ... (+{len(page_emojis) - 10} more)"
             embed.add_field(name="Emojis on this page", value=emoji_preview, inline=False)
         
-# Show server emoji stats
-animated_count = len([e for e in guild_emojis if e.animated])
-static_count = len(guild_emojis) - animated_count
-embed.add_field(
-    name="Server Emoji Statistics",
-    value=f"Total: {len(guild_emojis)}\nStatic: {static_count}\nAnimated: {animated_count}",
-    inline=True
-)
+    # Show server emoji stats
+    animated_count = len([e for e in guild_emojis if e.animated])
+    static_count = len(guild_emojis) - animated_count
+    embed.add_field(
+        name="Server Emoji Statistics",
+        value=f"Total: {len(guild_emojis)}\nStatic: {static_count}\nAnimated: {animated_count}",
+        inline=True
+    )
 
-    if hasattr(interaction, 'response') and not interaction.response.is_done():
+    if hasattr(interaction,'response') and not interaction.response.is_done():
         await interaction.response.edit_message(embed=embed, view=self)
     else:
         await interaction.edit_original_response(embed=embed, view=self)
