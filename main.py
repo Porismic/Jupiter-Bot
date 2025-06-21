@@ -4659,7 +4659,6 @@ async def update_display(self, interaction: discord.Interaction):
         color=BOT_CONFIG["default_embed_color"]
     )
         
-        status = []
         if self.embed_data["title"]:
             status.append(f"✅ Title: {self.embed_data['title'][:50]}...")
         else:
@@ -4688,6 +4687,7 @@ class EmbedBasicInfoModal(discord.ui.Modal):
     def __init__(self, embed_view):
         super().__init__(title="Embed Basic Information")
         self.embed_view = embed_view
+        status = []
 
         self.title_input = discord.ui.TextInput(
             label="Title",
