@@ -4945,14 +4945,12 @@ class SaveEmbedModal(discord.ui.Modal):
     def __init__(self, embed_view):
         super().__init__(title="Save Embed")
         self.embed_view = embed_view
-
         self.name_input = discord.ui.TextInput(
             label="Save Name",
             placeholder="Enter a name for this embed",
             required=True,
             max_length=50
         )
-
         self.save_type = discord.ui.TextInput(
             label="Save Type",
             placeholder="'preset' for reusable template or 'embed' for complete embed",
@@ -4960,16 +4958,75 @@ class SaveEmbedModal(discord.ui.Modal):
             required=True,
             max_length=10
         )
-
         self.add_item(self.name_input)
         self.add_item(self.save_type)
-
+    
     async def on_submit(self, interaction: discord.Interaction):
         save_name = self.name_input.value
         save_type = self.save_type.value.lower()
         
         if save_type not in ["preset", "embed"]:
-
+            await interaction.response.send_message(
+                "❌ Invalid save type! Please use 'preset' or 'embed'.",
+                ephemeral=True
+            )
+            return
+        
+        try:
+            # Get user ID for saving
+            user_id = str(interaction.user.id)
+            
+            # Initialize user data if it doesn't exist
+            if user_id not in user_data:
+                user_data[user_id] = {"saved_embeds": {}, "saved_presets": {}}
+            
+            if save_type == "preset":
+                # Save as preset (template without specific content)
+                preset_data = {
+                    "color": self.embed_view.embed_data.get("color"),
+                    "footer": self.embed_view.embed_data.get("footer"),
+                    "author": self.embed_view.embed_data.get("author"),
+                    "thumbnail": self.embed_view.embed_data.get("thumbnail"),
+                    "image": self.embed_view.embed_data.get("image"),
+                    "timestamp": self.embed_view.embed_data.get("timestamp", False)
+                }
+                user_data[user_id]["saved_presets"][save_name] = preset_data
+                
+                await interaction.response.send_message(
+                    f"✅ Successfully saved preset '{save_name}'! You can now apply this preset to new embeds.",
+                    ephemeral=True
+                )
+                
+            elif save_type == "embed":
+                # Save complete embed with all data
+                user_data[user_id]["saved_embeds"][save_name] = self.embed_view.embed_data.copy()
+                
+                await interaction.response.send_message(
+                    f"✅ Successfully saved embed '{save_name}'! You can now load this complete embed anytime.",
+                    ephemeral=True
+                )
+            
+            # Optional: Save to file/database here if needed
+            # save_user_data()
+            
+        except Exception as e:
+            await interaction.response.send_message(
+                f"❌ Error saving {save_type}: {str(e)}",
+                ephemeral=True
+            )
+    
+    async def on_error(self, interaction: discord.Interaction, error: Exception):
+        try:
+            await interaction.response.send_message(
+                "❌ An error occurred while saving. Please try again.",
+                ephemeral=True
+            )
+        except:
+            # If response already sent, try to follow up
+            await interaction.followup.send(
+                "❌ An error occurred while saving. Please try again.",
+                ephemeral=True
+            )
 
 async def handle_member_join_invite_tracking(member: discord.Member):
     """Handle invite tracking when a member joins"""
@@ -4993,37 +5050,41 @@ async def handle_member_join_invite_tracking(member: discord.Member):
             # Update invite data
             invite_data["invites"][used_invite.code]["uses"] = used_invite.uses
             
-            # Update inviter's stats
-            if "members" not in invite_data:
-                invite_data["members"] = {}
-            
-            inviter_id = str(inviter.id)
-            if inviter_id not in invite_data["members"]:
-                invite_data["members"][inviter_id] = {
-                    "total_invites": 0,
-                    "left_invites": 0,
-                    "recent_invites": []
-                }
-            
-            invite_data["members"][inviter_id]["total_invites"] += 1
-            invite_data["members"][inviter_id]["recent_invites"].append({
-                "member_id": member.id,
-                "timestamp": int(time.time())
-            })
-            
-            # Keep only last 10 recent invites
-            if len(invite_data["members"][inviter_id]["recent_invites"]) > 10:
-                invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
-            
-            # Record who invited this member
-            member_id = str(member.id)
-            if "members" not in invite_data:
-                invite_data["members"] = {}
-            invite_data["members"][member_id] = {
-                "invited_by": inviter.id,
-                "invite_code": used_invite.code,
-                "join_timestamp": int(time.time())
-            }
+# Update inviter's stats
+if "members" not in invite_data:
+    invite_data["members"] = {}
+
+inviter_id = str(inviter.id)
+if inviter_id not in invite_data["members"]:
+    invite_data["members"][inviter_id] = {
+        "total_invites": 0,
+        "left_invites": 0,
+        "recent_invites": []
+    }
+
+invite_data["members"][inviter_id]["total_invites"] += 1
+invite_data["members"][inviter_id]["recent_invites"].append({
+    "member_id": member.id,
+    "timestamp": int(time.time())
+})
+
+# Keep only last 10 recent invites
+if len(invite_data["members"][inviter_id]["recent_invites"]) > 10:
+    invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
+
+# Record who invited this member
+member_id = str(member.id)
+# Check if member already exists and has inviter data to avoid overwriting
+if member_id not in invite_data["members"]:
+    invite_data["members"][member_id] = {}
+
+# Only add member data if they don't already have inviter stats
+if "total_invites" not in invite_data["members"][member_id]:
+    invite_data["members"][member_id] = {
+        "invited_by": inviter.id,
+        "invite_code": used_invite.code,
+        "join_timestamp": int(time.time())
+    }
             
             save_json("invite_data.json", invite_data)
             
