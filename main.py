@@ -5926,7 +5926,6 @@ class GeneralConfigView(discord.ui.View):
 class CurrencySymbolModal(discord.ui.Modal):
     def __init__(self):
         super().__init__(title="Set Currency Symbol")
-
         self.symbol = discord.ui.TextInput(
             label="Currency Symbol",
             placeholder="Enter currency symbol (e.g., $, €, ¥)",
@@ -5935,7 +5934,7 @@ class CurrencySymbolModal(discord.ui.Modal):
             max_length=5
         )
         self.add_item(self.symbol)
-
+    
     async def on_submit(self, interaction: discord.Interaction):
         BOT_CONFIG["currency_symbol"] = self.symbol.value
         save_json("bot_config.json", BOT_CONFIG)
@@ -5953,7 +5952,6 @@ async def config_command(interaction: discord.Interaction):
     if not has_admin_permissions(interaction):
         await interaction.response.send_message("You need administrator permissions to access bot configuration.", ephemeral=True)
         return
-
     view = ConfigurationView()
     embed = discord.Embed(
         title="Bot Configuration",
@@ -5964,7 +5962,6 @@ async def config_command(interaction: discord.Interaction):
     await interaction.response.send_message(embed=embed, view=view, ephemeral=True)
 
 # --------- Missing Background Tasks -----------
-
 @tasks.loop(hours=24)
 async def reset_daily():
     """Reset daily statistics"""
