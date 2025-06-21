@@ -9308,23 +9308,23 @@ embed.add_field(
     inline=True
 )
 
-if hasattr(interaction, 'response') and not interaction.response.is_done():
-    await interaction.response.edit_message(embed=embed, view=self)
-else:
-    await interaction.edit_original_response(embed=embed, view=self)
+    if hasattr(interaction, 'response') and not interaction.response.is_done():
+        await interaction.response.edit_message(embed=embed, view=self)
+    else:
+        await interaction.edit_original_response(embed=embed, view=self)
 
-# This should be part of a larger if/elif chain
-if action.value == "create":
-    # Your create logic here
-    pass
-elif action.value == "list":
-    embed = discord.Embed(
-        title="Autoresponders",
-        color=BOT_CONFIG["default_embed_color"]
-    )
+        # This should be part of a larger if/elif chain
+    if action.value == "create":
+        # Your create logic here
+        pass
+    elif action.value == "list":
+        embed = discord.Embed(
+            title="Autoresponders",
+            color=BOT_CONFIG["default_embed_color"]
+        )
     
-    # Check if you have autoresponders stored somewhere
-    # This assumes you have them in a dictionary or list called 'autoresponders'
+        # Check if you have autoresponders stored somewhere
+        # This assumes you have them in a dictionary or list called 'autoresponders'
     if not autoresponders:  # Replace 'autoresponders' with your actual variable
         embed.description = "No autoresponders configured."
     else:
