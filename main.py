@@ -4207,8 +4207,7 @@ async def quarantine(interaction: discord.Interaction, member: discord.Member, d
     if duration_minutes <= 0 or duration_minutes > 10080:  # Max 1 week
         await interaction.response.send_message("Duration must be between 1 minute and 1 week.", ephemeral=True)
         return
-
-    try:
+        
         # Store original roles
         original_roles = [role.id for role in member.roles if role != interaction.guild.default_role]
         
