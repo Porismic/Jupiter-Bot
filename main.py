@@ -4190,11 +4190,22 @@ class AuctionListView(discord.ui.View):
         else:
             await interaction.edit_original_response(embed=embed, view=self)
 
-@tree.command(name="auctionlist", description="View active auctions with advanced filtering", guild=discord.Object(id=GUILD_ID))
+@tree.command(
+    name="auctionlist",
+    description="View active auctions with advanced filtering",
+    guild=discord.Object(id=GUILD_ID)
+)
 @guild_only()
 async def auction_list(interaction: discord.Interaction):
     view = AuctionListView()
-    await view.update_display(interaction)
+    try:
+        await interaction.response.defer()  # Prevents 'interaction failed' if view takes time
+        await view.update_display(interaction)  # This method must send or edit a message
+    except Exception as e:
+        await interaction.followup.send(
+            f"An error occurred while displaying the auction list: `{e}`",
+            ephemeral=True
+        )
 
 @tree.command(name="quarantine", description="Temporarily isolate a member", guild=discord.Object(id=GUILD_ID))
 @guild_only()
@@ -4207,13 +4218,14 @@ async def quarantine(interaction: discord.Interaction, member: discord.Member, d
     if duration_minutes <= 0 or duration_minutes > 10080:  # Max 1 week
         await interaction.response.send_message("Duration must be between 1 minute and 1 week.", ephemeral=True)
         return
-        
+
+    try:
         # Store original roles
         original_roles = [role.id for role in member.roles if role != interaction.guild.default_role]
-        
+
         # Remove all roles except @everyone
         await member.edit(roles=[interaction.guild.default_role], reason=f"Quarantined by {interaction.user}: {reason}")
-        
+
         # Store quarantine data
         quarantine_data = server_settings.get("quarantined_users", {})
         quarantine_data[str(member.id)] = {
@@ -4224,42 +4236,21 @@ async def quarantine(interaction: discord.Interaction, member: discord.Member, d
         }
         server_settings["quarantined_users"] = quarantine_data
         save_json("server_settings.json", server_settings)
-        
+
         embed = discord.Embed(
             title="Member Quarantined",
             description=f"**Member:** {member.mention}\n**Duration:** {duration_minutes} minutes\n**Reason:** {reason}\n**Staff:** {interaction.user.mention}",
             color=0xFFA500
         )
-        
+
         await interaction.response.send_message(embed=embed)
-        
+
         # Schedule unquarantine
         await asyncio.sleep(duration_minutes * 60)
         await unquarantine_user(member, interaction.guild)
-try:
-    # Store quarantine data
-    quarantine_data = server_settings.get("quarantined_users", {})
-    quarantine_data[str(member.id)] = {
-        "original_roles": original_roles,
-        "end_time": int(time.time()) + (duration_minutes * 60),
-        "reason": reason,
-        "staff_id": interaction.user.id
-    }
-    server_settings["quarantined_users"] = quarantine_data
-    save_json("server_settings.json", server_settings)
 
-    embed = discord.Embed(
-        title="Member Quarantined",
-        description=f"**Member:** {member.mention}\n**Duration:** {duration_minutes} minutes\n**Reason:** {reason}\n**Staff:** {interaction.user.mention}",
-        color=0xFFA500
-    )
-
-    # Schedule unquarantine
-    await asyncio.sleep(duration_minutes * 60)
-    await unquarantine_user(member, interaction.guild)
-        
-except discord.Forbidden:
-    await interaction.response.send_message("I don't have permission to modify this user's roles.", ephemeral=True)
+    except discord.Forbidden:
+        await interaction.response.send_message("I don't have permission to modify this user's roles.", ephemeral=True)
 
 async def unquarantine_user(member: discord.Member, guild: discord.Guild):
     try:
