@@ -5050,41 +5050,40 @@ async def handle_member_join_invite_tracking(member: discord.Member):
             # Update invite data
             invite_data["invites"][used_invite.code]["uses"] = used_invite.uses
             
-# Update inviter's stats
-if "members" not in invite_data:
-    invite_data["members"] = {}
+            # Update inviter's stats
+            if "members" not in invite_data:
+                invite_data["members"] = {}
+                inviter_id = str(inviter.id)
+            if inviter_id not in invite_data["members"]:
+                invite_data["members"][inviter_id] = {
+                "total_invites": 0,
+                "left_invites": 0,
+                "recent_invites": []
+            }
 
-inviter_id = str(inviter.id)
-if inviter_id not in invite_data["members"]:
-    invite_data["members"][inviter_id] = {
-        "total_invites": 0,
-        "left_invites": 0,
-        "recent_invites": []
-    }
+            invite_data["members"][inviter_id]["total_invites"] += 1
+            invite_data["members"][inviter_id]["recent_invites"].append({
+            "member_id": member.id,
+            "timestamp": int(time.time())
+            })
 
-invite_data["members"][inviter_id]["total_invites"] += 1
-invite_data["members"][inviter_id]["recent_invites"].append({
-    "member_id": member.id,
-    "timestamp": int(time.time())
-})
+            # Keep only last 10 recent invites
+            if len(invite_data["members"][inviter_id]["recent_invites"]) > 10:
+            invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
 
-# Keep only last 10 recent invites
-if len(invite_data["members"][inviter_id]["recent_invites"]) > 10:
-    invite_data["members"][inviter_id]["recent_invites"] = invite_data["members"][inviter_id]["recent_invites"][-10:]
+            # Record who invited this member
+            member_id = str(member.id)
+            # Check if member already exists and has inviter data to avoid overwriting
+            if member_id not in invite_data["members"]:
+                invite_data["members"][member_id] = {}
 
-# Record who invited this member
-member_id = str(member.id)
-# Check if member already exists and has inviter data to avoid overwriting
-if member_id not in invite_data["members"]:
-    invite_data["members"][member_id] = {}
-
-# Only add member data if they don't already have inviter stats
-if "total_invites" not in invite_data["members"][member_id]:
-    invite_data["members"][member_id] = {
-        "invited_by": inviter.id,
-        "invite_code": used_invite.code,
-        "join_timestamp": int(time.time())
-    }
+            # Only add member data if they don't already have inviter stats
+            if "total_invites" not in invite_data["members"][member_id]:
+                invite_data["members"][member_id] = {
+                    "invited_by": inviter.id,
+                    "invite_code": used_invite.code,
+                    "join_timestamp": int(time.time())
+                }
             
             save_json("invite_data.json", invite_data)
             
