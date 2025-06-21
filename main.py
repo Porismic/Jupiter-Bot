@@ -4638,7 +4638,6 @@ async def inviteleaderboard(interaction: discord.Interaction):
     
     await interaction.response.send_message(embed=embed)
 
-
     try:
         embed.set_image(url=self.embed_data["image"])
     except Exception as e:
@@ -4647,10 +4646,10 @@ async def inviteleaderboard(interaction: discord.Interaction):
     if self.embed_data["footer"]:
             embed.set_footer(text=self.embed_data["footer"])
         
-    if self.embed_data["author"]:
-            embed.set_author(name=self.embed_data["author"])
-        
-    return embed
+if self.embed_data["author"]:
+    embed.set_author(name=self.embed_data["author"])
+
+return embed
 
 async def update_display(self, interaction: discord.Interaction):
     embed = discord.Embed(
@@ -4658,16 +4657,32 @@ async def update_display(self, interaction: discord.Interaction):
         description="Current embed configuration:",
         color=BOT_CONFIG["default_embed_color"]
     )
-        
-        if self.embed_data["title"]:
-            status.append(f"✅ Title: {self.embed_data['title'][:50]}...")
-        else:
-            status.append("❌ No title set")
-        
-        if self.embed_data["description"]:
-            status.append(f"✅ Description: {len(self.embed_data['description'])} characters")
-        else:
-            status.append("❌ No description set")
+    
+    # Initialize the status list
+    status = []
+    
+    if self.embed_data["title"]:
+        status.append(f"✅ Title: {self.embed_data['title'][:50]}...")
+    else:
+        status.append("❌ No title set")
+    
+    if self.embed_data["description"]:
+        status.append(f"✅ Description: {len(self.embed_data['description'])} characters")
+    else:
+        status.append("❌ No description set")
+    
+    # Add the status information to the embed
+    embed.add_field(
+        name="Status",
+        value="\n".join(status),
+        inline=False
+    )
+    
+    # Actually update the interaction (choose one based on your needs)
+    if interaction.response.is_done():
+        await interaction.edit_original_response(embed=embed)
+    else:
+        await interaction.response.edit_message(embed=embed)
         
         status.append(f"📝 Fields: {len(self.embed_data['fields'])}")
         
