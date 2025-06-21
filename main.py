@@ -4236,9 +4236,32 @@ async def quarantine(interaction: discord.Interaction, member: discord.Member, d
         # Schedule unquarantine
         await asyncio.sleep(duration_minutes * 60)
         await unquarantine_user(member, interaction.guild)
+try:
+    # Store quarantine data
+    quarantine_data = server_settings.get("quarantined_users", {})
+    quarantine_data[str(member.id)] = {
+        "original_roles": original_roles,
+        "end_time": int(time.time()) + (duration_minutes * 60),
+        "reason": reason,
+        "staff_id": interaction.user.id
+    }
+    server_settings["quarantined_users"] = quarantine_data
+    save_json("server_settings.json", server_settings)
+
+    embed = discord.Embed(
+        title="Member Quarantined",
+        description=f"**Member:** {member.mention}\n**Duration:** {duration_minutes} minutes\n**Reason:** {reason}\n**Staff:** {interaction.user.mention}",
+        color=0xFFA500
+    )
+
+    await interaction.response.send_message(embed=embed)
+
+    # Schedule unquarantine
+    await asyncio.sleep(duration_minutes * 60)
+    await unquarantine_user(member, interaction.guild)
         
-    except discord.Forbidden:
-        await interaction.response.send_message("I don't have permission to modify this user's roles.", ephemeral=True)
+except discord.Forbidden:
+    await interaction.response.send_message("I don't have permission to modify this user's roles.", ephemeral=True)
 
 async def unquarantine_user(member: discord.Member, guild: discord.Guild):
     try:
