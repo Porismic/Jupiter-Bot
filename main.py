@@ -9326,11 +9326,11 @@ class EmojiSelectionView(discord.ui.View):
         else:
             await interaction.edit_original_response(embed=embed, view=self)
 
-    elif action.value == "list":
-        embed = discord.Embed(
-            title="Autoresponders",
-            color=BOT_CONFIG["default_embed_color"]
-        )
+        elif action.value == "list":
+            embed = discord.Embed(
+                title="Autoresponders",
+                color=BOT_CONFIG["default_embed_color"]
+         )
         
         if not autoresponders:
             embed.description = "No autoresponders configured."
